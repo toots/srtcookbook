@@ -32,7 +32,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.5.0">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.4.3">
     
     
       
@@ -40,12 +40,12 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/application.1b62728e.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/application.30686662.css">
       
       
     
     
-      <script src="../../assets/javascripts/modernizr.268332fc.js"></script>
+      <script src="../../assets/javascripts/modernizr.74668098.js"></script>
     
     
       
@@ -541,6 +541,17 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.0/js/ion.rangeSlider.min.js"></script>
 
+<!--script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.esm.js"></script-->
+
+<!--script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.js"></script-->
+
+<style>
+    :root {
+      --ion-safe-area-top: 20px;
+      --ion-safe-area-bottom: 22px;
+    }
+</style>
+
 <canvas id="stacked-area-chart" width="800" height="400"></canvas>
 
 <script type="text/javascript">
@@ -592,11 +603,11 @@ function createDataSet(beginMbps, endMbps, stepMbps, lossRatio = 0) {
     //const {dataHdrBits, ackBits, ackackBits, nakBits, resendBits} = calcOverhead(Mbps, 0, 0);
     const {dataHdrBytes, ackBytes, ackackBytes, nakBytes, resendBytes} = calcOverhead(Mbps, lossRatio, 0);
     bitrates.push(Mbps);
-    dataHeaderBits.push((8 * dataHdrBytes) / (Mbps * 10000));
-    ackBits.push((8 * ackBytes) / (Mbps * 10000));
-    ackackBits.push((8 * ackackBytes) / (Mbps * 10000));
-    nakBits.push((8 * nakBytes) / (Mbps * 10000));
-    resendBits.push((8 * resendBytes) / (Mbps * 10000));
+    dataHeaderBits.push(((8 * dataHdrBytes) / (Mbps * 10000)).toFixed(3));
+    ackBits.push(((8 * ackBytes) / (Mbps * 10000)).toFixed(3));
+    ackackBits.push(((8 * ackackBytes) / (Mbps * 10000)).toFixed(3));
+    nakBits.push(((8 * nakBytes) / (Mbps * 10000)).toFixed(3));
+    resendBits.push(((8 * resendBytes) / (Mbps * 10000)).toFixed(3));
   }
   //console.log(ackackBits)
   return {
@@ -630,8 +641,8 @@ const colors = {
 };
 
 function onLossRatioChanged(value) {
-  console.log("New value " + value);
-  dataSet = createDataSet(1, 30, 5, value / 100);
+  //console.log("New value " + value);
+  dataSet = createDataSet(1, 30, 1, value / 100);
   myChart.data.datasets[0].data = dataSet.dataHeaderBits;
   myChart.data.datasets[1].data = dataSet.ackBits;
   myChart.data.datasets[2].data = dataSet.ackackBits;
@@ -642,7 +653,7 @@ function onLossRatioChanged(value) {
 }
 
 const dataPackets = Array.from(new Array(5), (val, i)=> calcOverhead(1+ i * 5, 0, 0) );
-var   dataSet = createDataSet(1, 30, 5);
+var   dataSet = createDataSet(1, 30, 1);
 const availableForExisting = [16, 13, 25, 33, 40, 33, 45];
 const unavailable = [5, 9, 10, 9, 18, 19, 20];
 
@@ -726,16 +737,18 @@ var myChart = new Chart(ctx, {
 
 <!--onchange="onLossRatioChanged(this.value)"-->
 
+<!--ion-toggle slot="start" value="Mbps" name="Mbps" checked></ion-toggle-->
+
 <p>
 <h3>Loss ratio:</h3>
-</p>
 
-<p><input type="text" class="js-range-slider" name="loss_ratio" value="0"  oninput="onLossRatioChanged(this.value)"/></p>
+<input type="text" class="js-range-slider" name="loss_ratio" value="0"  oninput="onLossRatioChanged(this.value)"/>
+
 <p>
 <h3>Latency (xRTT):</h3>
-</p>
 
-<p>TODO</p>
+TODO
+
 <script type="text/javascript">
 $(".js-range-slider").ionRangeSlider({
         skin: "round",
@@ -816,7 +829,7 @@ $(".js-range-slider").ionRangeSlider({
       
     </div>
     
-      <script src="../../assets/javascripts/application.a8b5e56f.js"></script>
+      <script src="../../assets/javascripts/application.ac79c3b0.js"></script>
       
       <script>app.initialize({version:"1.0.4",url:{base:"../.."}})</script>
       
