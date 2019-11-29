@@ -688,9 +688,10 @@
 <p>SRT has an end-to-end latency between the time a packet is given to SRT (<code>srt_sendmsg(...)</code>) and the time this very packet is received from SRT (<code>srt_recvmsg(...)</code>).</p>
 <p>The timing diagram issulstrates those key latency points with TSBPD enabled (live mode).</p>
 <p><img alt="" src="../tsbpd-latency.png" /></p>
-<p><strong>!!! warning "Latency confustion"</strong></p>
-<p>The docs on <code>SRTO_RCVLATENCY</code> say it sets "the time that should elapse since the moment when the packet was sent and the moment when it is delivered to the receiver application in the receiving function."
-But the actual latency on the link will roughly be <code>SRTO_RCVLATENCY + RTT/2</code> </p>
+<div class="admonition note">
+<p class="admonition-title">End-to-end latency</p>
+<p>The actual latency on the link will roughly be SRTO_RCVLATENCY + 1/2 × RTT<sub>0</sub>, where RTT<sub>0</sub> is the RTT value during the handshake.</p>
+</div>
 <h2 id="packet-delivery-time">Packet Delivery Time</h2>
 <p>Packet delivery time is the time point, estimated by the receiver, when a packet should be given (delivered) to the upstream application (via <code>srt_recvmsg(...)</code>). It consists of the <code>TsbPdTimeBase</code> - the base time </p>
 <p><code>PktTsbPdTime = TsbPdTimeBase + TsbPdDelay + PKT_TIMESTAMP + Drift</code></p>
