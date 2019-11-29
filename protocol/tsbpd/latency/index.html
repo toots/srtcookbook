@@ -36,7 +36,7 @@
     
     
       
-        <title>Drift Tracer - SRT CookBook</title>
+        <title>SRT Latency - SRT CookBook</title>
       
     
     
@@ -75,7 +75,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#drift-tracer" tabindex="1" class="md-skip">
+      <a href="#srt-latency" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -101,7 +101,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                Drift Tracer
+                SRT Latency
               
             </span>
           
@@ -485,11 +485,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        Drift Tracer
+        SRT Latency
       </label>
     
-    <a href="./" title="Drift Tracer" class="md-nav__link md-nav__link--active">
-      Drift Tracer
+    <a href="./" title="SRT Latency" class="md-nav__link md-nav__link--active">
+      SRT Latency
     </a>
     
       
@@ -684,8 +684,15 @@
               
                 
                 
-                <h1 id="drift-tracer">Drift Tracer</h1>
+                <h1 id="srt-latency">SRT Latency</h1>
+<p>SRT has an end-to-end latency between the time a packet is given to SRT (<code>srt_sendmsg(...)</code>) and the time this very packet is received from SRT (<code>srt_recvmsg(...)</code>).</p>
+<p>The timing diagram issulstrates those key latency points with TSBPD enabled (live mode).</p>
+<p><img alt="" src="../tsbpd-latency.png" /></p>
+<p><strong>!!! warning "Latency confustion"</strong></p>
+<p>The docs on <code>SRTO_RCVLATENCY</code> say it sets "the time that should elapse since the moment when the packet was sent and the moment when it is delivered to the receiver application in the receiving function."
+But the actual latency on the link will roughly be <code>SRTO_RCVLATENCY + RTT/2</code> </p>
 <h2 id="packet-delivery-time">Packet Delivery Time</h2>
+<p>Packet delivery time is the time point, estimated by the receiver, when a packet should be given (delivered) to the upstream application (via <code>srt_recvmsg(...)</code>). It consists of the <code>TsbPdTimeBase</code> - the base time </p>
 <p><code>PktTsbPdTime = TsbPdTimeBase + TsbPdDelay + PKT_TIMESTAMP + Drift</code></p>
 <h2 id="tsbpd-base-time">TSBPD Base Time</h2>
 <p><code>TsbPdTimeBase</code> is the base time difference between local clock of the receiver, and the clock used by the sender to timestamp packets being sent. A unit of measurement is microseconds.</p>
