@@ -706,6 +706,10 @@
 </code></pre>
 
 <h3 id="upon-ack-received">Upon ACK Received</h3>
+<div class="admonition note">
+<p class="admonition-title">Only Full ACK triggers</p>
+<p>Lite ACK do not trigger this case!</p>
+</div>
 <p>ACK are processed not more often than every 10 milliseconds (<code>CUDT::COMM_SYN_INTERVAL_US</code>).</p>
 <p><code>CWND_SIZE</code> is increased to the difference between the acknowledged sequence number since last ACK processing, and the sequence number being acknowledged:  <code>CWND_SIZE += LAST_ACK_SEQNO - ACK_SEQNO</code>.</p>
 <p>If <code>CWND_SIZE</code> exceeds <code>MAX_CWND_SIZE</code>, slow start period ends. <code>MAX_CWND_SIZE=FLOW_WND_SIZE</code>. If delivery rate was reported by the receiver, the inter sending interval is set according to that rate.</p>
