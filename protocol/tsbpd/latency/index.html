@@ -685,7 +685,7 @@
                 
                 
                 <h1 id="srt-latency">SRT Latency</h1>
-<p>SRT has an end-to-end latency between the time a packet is given to SRT (<code>srt_sendmsg(...)</code>) and the time this very packet is received from SRT (<code>srt_recvmsg(...)</code>).</p>
+<p>SRT has an end-to-end latency between the time a packet is given to SRT with <code>srt_sendmsg(...)</code> and the time this very packet is received from SRT via <code>srt_recvmsg(...)</code>.</p>
 <p>The timing diagram illustrates those key latency points with TSBPD enabled (live mode).</p>
 <p><img alt="" src="../tsbpd-latency.png" /></p>
 <div class="admonition note">
@@ -693,7 +693,9 @@
 <p>The actual latency on the link will roughly be SRTO_RCVLATENCY + 1/2 × RTT<sub>0</sub>, where RTT<sub>0</sub> is the RTT value during the handshake.</p>
 </div>
 <h2 id="packet-delivery-time">Packet Delivery Time</h2>
-<p>Packet delivery time is the time point, estimated by the receiver, when a packet should be given (delivered) to the upstream application (via <code>srt_recvmsg(...)</code>). It consists of the <code>TsbPdTimeBase</code> - the base time </p>
+<p>Packet delivery time is the time point, estimated by the receiver, when a packet should be given (delivered) to the upstream application (via <code>srt_recvmsg(...)</code>).
+It consists of the <code>TsbPdTimeBase</code> - the base time difference between sender's and receiver's clock, receiver's buffer delay <code>TsbPdDelay</code>, a timestamp of a data packet <code>PKT_TIMESTAMP</code>,
+and a time drift <code>Drift</code>.</p>
 <p><code>PktTsbPdTime = TsbPdTimeBase + TsbPdDelay + PKT_TIMESTAMP + Drift</code></p>
 <h2 id="tsbpd-base-time">TSBPD Base Time</h2>
 <p><code>TsbPdTimeBase</code> is the base time difference between local clock of the receiver, and the clock used by the sender to timestamp packets being sent. A unit of measurement is microseconds.</p>
@@ -716,6 +718,11 @@ In other words, TSBPD time wrapping happens every 01:11:35.</p>
 Therefore, the above equation can be considered as <br />
 <code>DRIFT = T_NOW - (T_NOW - T_SENDER + T_SENDER) -&gt; 0</code> if the link latency remains constant.</p>
 <p>Assuming that the link latency is constant (RTT=const), the only cause of the drift fluctuations should be clock inaccuracy.</p>
+<div class="admonition error">
+<p class="admonition-title">Drift Tracer should consider RTT</p>
+<p>Time drift sample does not take RTT fluctuations into account.
+Instead an increase of RTT will be treated as a time drift. See <a href="https://github.com/Haivision/srt/issues/753">issue 753</a>.</p>
+</div>
 <h2 id="drift-tracing-and-adjustment">Drift Tracing and Adjustment</h2>
 <p>Drift tracing is based on accumulating the sum of drift samples.<br />
 <strong>DriftSum</strong> - the sum of the time drift samples on a <strong>MAX_SPAN</strong> number of samples.<br />
@@ -755,7 +762,10 @@ The value of <strong>OverDrift</strong> is used to update the <strong>TsbPdTimeB
 }
 </code></pre>
 
-<p><strong>TODO:</strong> Use RTTVar.</p>
+<div class="admonition todo">
+<p class="admonition-title">Consider RTTVar before changin the Drift value</p>
+<p><strong>RTTVar</strong> expresses the variation of RTT values over time. Those variations should be considered when Drift is updated.</p>
+</div>
 <h2 id="class-drifttracer">Class DriftTracer</h2>
 <p>The <strong>DriftTracer</strong> class has the following prototype.</p>
 <pre><code class="text">template&lt;unsigned MAX_SPAN, int MAX_DRIFT, bool CLEAR_ON_UPDATE = true&gt;
