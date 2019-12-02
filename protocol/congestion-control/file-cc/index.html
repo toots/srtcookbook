@@ -36,7 +36,7 @@
     
     
       
-        <title>File CC - SRT CookBook</title>
+        <title>File Congestion Control - SRT CookBook</title>
       
     
     
@@ -75,7 +75,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#file-cc" tabindex="1" class="md-skip">
+      <a href="#file-congestion-control" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -101,7 +101,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                File CC
+                File Congestion Control
               
             </span>
           
@@ -437,11 +437,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        File CC
+        File Congestion Control
       </label>
     
-    <a href="./" title="File CC" class="md-nav__link md-nav__link--active">
-      File CC
+    <a href="./" title="File Congestion Control" class="md-nav__link md-nav__link--active">
+      File Congestion Control
     </a>
     
       
@@ -459,11 +459,58 @@
     Slow Start
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upon-ack-received" class="md-nav__link">
+    Upon ACK Received
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#upon-timers-are-checked" class="md-nav__link">
+    Upon timers are checked
+  </a>
+  
 </li>
       
         <li class="md-nav__item">
   <a href="#congestion-avoidance" class="md-nav__link">
     Congestion Avoidance
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upon-ack" class="md-nav__link">
+    Upon ACK
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upon-loss-report-nack" class="md-nav__link">
+    Upon Loss Report (NACK)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    References
   </a>
   
 </li>
@@ -574,11 +621,58 @@
     Slow Start
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upon-ack-received" class="md-nav__link">
+    Upon ACK Received
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#upon-timers-are-checked" class="md-nav__link">
+    Upon timers are checked
+  </a>
+  
 </li>
       
         <li class="md-nav__item">
   <a href="#congestion-avoidance" class="md-nav__link">
     Congestion Avoidance
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upon-ack" class="md-nav__link">
+    Upon ACK
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upon-loss-report-nack" class="md-nav__link">
+    Upon Loss Report (NACK)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    References
   </a>
   
 </li>
@@ -600,11 +694,39 @@
               
                 
                 
-                <h1 id="file-cc">File CC</h1>
-<p>The congestion control in SRT mainly relies on the value called SndPeriod, it's the required minimum time gap between sending two consecutive packets (in [us]).</p>
+                <h1 id="file-congestion-control">File Congestion Control</h1>
+<p>The main goal of File congestion control is to send data at the highest possible rate within the given network conditions. Sending with higher rate than the avalable bandwidth of a link will result in  network congestion, forcing huge overhead due to necessity of packet retransmission. Sending with the rate lower, that the available bandwidth, results in underutilization of the network link.</p>
+<p>FileCC has three operation states: slow start, congestion avoidance and slow down.</p>
+<p>At the start, there is no information on the network. Congestion control module has to do some probing to determine the available bandwidth and the best sending pace for the normal operation mode - congestion avoidance.</p>
+<p>In congestion avoidance state, as long as there is no congestion detected (via Loss reports), the sending pace is gradually increased. In case of network congestion, the state is switched to slow down, where the sending pace is reduced to eliminate packet loss in a congested network.</p>
 <h2 id="slow-start">Slow Start</h2>
-<p>The congestion control in SRT mainly relies on the value called SndPeriod, it's the required minimum time gap between sending two consecutive packets (in [us]). It's not the waiting time between packets, it's rather the time expected to be between consecutive sending, that is, when the time at the moment of the packet to be sent is distant to the previous sending time by less than SndPeriod, the procedure is sleeping for the "remaining time", otherwise the packet is sent immediately. The whole congestion control relies on setting appropriate value to SndPeriod in order to achieve appropriate sending speed. The original UDT algorithm (implemented by FileSmoother) relies on the following rules:</p>
+<p>Slow-start state has an artificial limit on the number of data packets that can be sent before acknowledgment of those segments is received. Slow-start is designed to limit network congestion [1].</p>
+<p>File CC starts with 16 DATA packets (<code>CWND_SIZE=16</code>) sent with minimum possible interval.</p>
+<pre><code class="c++">int m_iRCInterval;          // SRT Rate control interval
+</code></pre>
+
+<h3 id="upon-ack-received">Upon ACK Received</h3>
+<p>ACK are processed not more often than every 10 milliseconds (<code>CUDT::COMM_SYN_INTERVAL_US</code>).</p>
+<p><code>CWND_SIZE</code> is increased to the difference between the acknowledged sequence number since last ACK processing, and the sequence number being acknowledged:  <code>CWND_SIZE += LAST_ACK_SEQNO - ACK_SEQNO</code>.</p>
+<p>If <code>CWND_SIZE</code> exceeds <code>MAX_CWND_SIZE</code>, slow start period ends. <code>MAX_CWND_SIZE=FLOW_WND_SIZE</code>. If delivery rate was reported by the receiver, the inter sending interval is set according to that rate.</p>
+<pre><code>PKT_SND_PERIOD = 1000000.0 / DELIVERY_RATE
+</code></pre>
+
+<p>where <code>DELIVERY_RATE</code> is filtered with <code>IIR(8)</code>.</p>
+<p>If delivery rate is not reported, the sending period is set to be</p>
+<pre><code>PktSndPeriod = CWndSize / (RTT + RCInterval)
+</code></pre>
+
+<h2 id="upon-timers-are-checked">Upon timers are checked</h2>
+<p>Refer to <code>FileCC::speedupToWindowSize(...)</code>.</p>
+<p>When <code>CUDT::checkRexmitTimer(...)</code> is called and there is a timeout for the last response from the receiver, then slow start period ends, and the packet send period is set according to the above rules.</p>
 <h2 id="congestion-avoidance">Congestion Avoidance</h2>
+<h3 id="upon-ack">Upon ACK</h3>
+<h3 id="upon-loss-report-nack">Upon Loss Report (NACK)</h3>
+<h2 id="references">References</h2>
+<ol>
+<li>TCP/IP Characteristics. Windows Dev Center. [<a href="https://docs.microsoft.com/en-us/windows/win32/winsock/tcp-ip-characteristics-2">WEB</a>]</li>
+</ol>
                 
                   
                 

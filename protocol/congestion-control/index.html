@@ -466,8 +466,8 @@
 
 
   <li class="md-nav__item">
-    <a href="file-cc/" title="File CC" class="md-nav__link">
-      File CC
+    <a href="file-cc/" title="File Congestion Control" class="md-nav__link">
+      File Congestion Control
     </a>
   </li>
 
@@ -588,6 +588,9 @@
                 
                 <h1 id="congestion-control">Congestion Control</h1>
 <p>Starting from v1.3.0, SRT provides two types of data transmission: live and file. The mode can be selected via the socket option <code>SRTO_CONGESTION</code> (or more general <code>SRTO_TRANSTYPE</code> option).</p>
+<p>Live congestion control is used in live transmission mode. In this more the source has a certain rate (either constant or variable). Packets should be transmitted with the same rate as the source. Therefore, the congestion control module does not try to avoid network congestion. It is mainly a reactor on network events. Based on the network conditions (mainly RTT), LiveCC determines when a packet should be considered lost. On the receiving side, liveCC may decide when an ACK is needed prior to ACK timeout. LiveCC also determines the minimum time between consecutive packets are sent.</p>
+<p>File congestion control is used in file transmission mode. FileCC controls sending pace to avoid network congestion.</p>
+<p>the only job congestion control module does is to keep sending rate.</p>
 <h2 id="useful-links">Useful Links</h2>
 <ul>
 <li>Yunhong Gu. <a href="http://www.jenkinssoftware.com/raknet/manual/congestioncontrol.html">The UDT Congestion Control Algorithm</a>. 2009.</li>
@@ -628,13 +631,13 @@
           </a>
         
         
-          <a href="file-cc/" title="File CC" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="file-cc/" title="File Congestion Control" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                File CC
+                File Congestion Control
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
